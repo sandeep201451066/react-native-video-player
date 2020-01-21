@@ -26,8 +26,6 @@ export default class App extends React.Component {
       overlay: false,
       fullscreen: false
     };
-    this.leftTap = null;
-    this.rightTab = null;
   }
 
   lastTap = null;
@@ -57,19 +55,7 @@ export default class App extends React.Component {
     // ok now the theme is good to look
   }
 
-  load = ({ duration }) => {
-    console.log('duration', duration)
-    this.setState({
-      duration
-
-    })
-  } // now here the duration is update on load video
-  onLoadStart=()=>{
-    console.log('onLoadStart')
-  }
-  onEnd(){
-    console.log('onEnd')
-  }
+  load = ({ duration }) => this.setState({ duration }) // now here the duration is update on load video
   progress = ({ currentTime }) => this.setState({ currentTime }) // here the current time is upated
 
   backward = () => {
@@ -87,24 +73,6 @@ export default class App extends React.Component {
     this.video.seek(slide * this.state.duration); // here the upation is maked for video seeking
     clearTimeout(this.overlayTimer);
     this.overlayTimer = setTimeout(() => this.setState({ overlay: false }), 3000);
-  }
-  handleDoubleTapSeekLeft = () => {
-    const now = Date.now();
-    const DOUBLE_PRESS_DELAY = 300;
-    if (this.leftTap && (now - this.leftTap) < DOUBLE_PRESS_DELAY) {
-      this.youtubeSeekLeft();
-    } else {
-      this.leftTap = now;
-    }
-  }
-  handleDoubleTapSeekRight = () => {
-    const now = Date.now();
-    const DOUBLE_PRESS_DELAY = 300;
-    if (this.rightTab && (now - this.rightTab) < DOUBLE_PRESS_DELAY) {
-      this.youtubeSeekRight();
-    } else {
-      this.rightTab = now;
-    }
   }
 
   youtubeSeekLeft = () => {
@@ -135,9 +103,7 @@ export default class App extends React.Component {
     }
     this.setState({ fullscreen: !fullscreen });
   }
-  onBuffer() {
-    console.log('fffff===')
-  }
+
 
   render = () => {
     const { currentTime, duration, paused, overlay, fullscreen } = this.state;
@@ -148,21 +114,17 @@ export default class App extends React.Component {
             fullscreen={fullscreen}
             paused={paused} // this will manage the pause and play
             ref={ref => this.video = ref}
-            source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
-            // source={samplevideo}
+            source={samplevideo}
             style={{ ...StyleSheet.absoluteFill }}
             resizeMode='cover'
             onLoad={this.load}
-            onLoadStart={this.onLoadStart}
-            onEnd={this.onEnd}
-            onBuffer={this.onBuffer}
             onProgress={this.progress}
           // onVideoEnd={this.onEndVideo}
           />
           <View style={style.overlay}>
             {/* now we can remove this not */}
             {overlay ? <View style={{ ...style.overlaySet, backgroundColor: '#0006' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, justifyContent: 'space-around' }}>
+              <View style={{flexDirection:'row', alignItems:'center', flex: 1, justifyContent:'space-around'}}>
                 <Icon name='backward' style={style.icon} onPress={this.backward} />
                 <Icon name={paused ? 'play' : 'pause'} style={style.icon} onPress={() => this.setState({ paused: !paused })} />
                 <Icon name='forward' style={style.icon} onPress={this.forward} />
@@ -170,10 +132,9 @@ export default class App extends React.Component {
               <View style={style.sliderCont}>
                 <View style={style.timer}>
                   <Text style={{ color: 'white' }}>{this.getTime(currentTime)}</Text>
-                  <Text style={{ color: 'white' }}>{this.getTime(duration) + '  '}<Icon color="#FFF" size={48} onPress={this.fullscreen} name={fullscreen ? 'compress' : 'expand'} style={{ fontSize: 15 }} /></Text>
+                  <Text style={{ color: 'white' }}>{this.getTime(duration)}   <Icon onPress={this.fullscreen} name={fullscreen ? 'compress' : 'expand'} style={{ fontSize: 15 }} /></Text>
                 </View>
                 <Slider
-                  style={{ width: '100%' }}
                   maximumTrackTintColor='#FFFFFF'
                   minimumTrackTintColor='#F44336'
                   thumbTintColor='#F44336' // now the slider and the time will work
@@ -182,8 +143,8 @@ export default class App extends React.Component {
                 />
               </View>
             </View> : <View style={style.overlaySet}>
-                <TouchableWithoutFeedback ><View style={{ flex: 1 }} /></TouchableWithoutFeedback>
-                <TouchableWithoutFeedback ><View style={{ flex: 1 }} /></TouchableWithoutFeedback>
+                <TouchableWithoutFeedback onPress={this.youtubeSeekLeft}><View style={{ flex: 1 }} /></TouchableWithoutFeedback>
+                <TouchableWithoutFeedback onPress={this.youtubeSeekRight}><View style={{ flex: 1 }} /></TouchableWithoutFeedback>
               </View>}
           </View>
         </View>
